@@ -1,0 +1,1135 @@
+SOP: AI-Powered SVG Generator — MERN Stack Website
+
+
+
+
+
+
+
+STANDARD OPERATING PROCEDURE
+
+AI-Powered SVG Generator
+
+MERN Stack Web Application
+
+Document Information
+
+Version: 2.0  |  Created: 2026  |  Classification: Internal Development SOP
+Stack: MongoDB, Express.js, React.js, Node.js + Claude AI API
+
+
+
+
+
+Item
+
+Detail
+
+Document Title
+
+AI-Powered SVG Generator — MERN Stack SOP
+
+Version
+
+2.0
+
+Status
+
+Active
+
+Technology Stack
+
+MongoDB, Express.js, React.js (Vite), Node.js, Claude AI API
+
+Styling
+
+Tailwind CSS
+
+Auth
+
+JWT + bcrypt
+
+Deployment
+
+Render (backend) + Vercel (frontend) + MongoDB Atlas
+
+
+
+
+1. Project Overview
+
+This SOP defines the complete process for building an AI-powered SVG Generator using the MERN stack. The frontend is a React (Vite) SPA, the backend is an Express.js REST API running on Node.js, and data is persisted in MongoDB. The Claude AI API generates SVG code from natural language prompts.
+
+
+
+1.1  Core Objectives
+
+Accept natural language prompts and return valid SVG code via the Claude API
+
+Render live SVG previews in the React frontend
+
+Allow users to download, copy, or share SVGs
+
+Store prompt history per user account in MongoDB
+
+Provide a public gallery of community SVGs
+
+Admin dashboard for usage monitoring and content moderation
+
+
+
+1.2  MERN Architecture Overview
+
+Request Flow
+
+React (Vite SPA) → Axios → Express.js REST API → Claude API
+                                         ↓
+                                    MongoDB Atlas
+                                    (users, prompts, SVGs)
+                                         ↓
+                            JSON Response → React renders SVG
+
+
+
+1.3  Key Deliverables
+
+Deliverable
+
+Description
+
+Priority
+
+React Frontend
+
+Vite + React SPA with prompt UI, preview, gallery
+
+High
+
+Express REST API
+
+Node.js + Express backend with all routes
+
+High
+
+Claude AI Integration
+
+POST to Claude API, return SVG code
+
+High
+
+MongoDB Database
+
+Mongoose schemas for User, Prompt, SVG
+
+High
+
+JWT Authentication
+
+Register, login, protected routes
+
+High
+
+Download / Export
+
+SVG file download and copy-to-clipboard
+
+Medium
+
+Admin Panel
+
+Usage analytics and content moderation
+
+Medium
+
+CI/CD
+
+Auto-deploy backend (Render) + frontend (Vercel)
+
+Medium
+
+
+
+
+2. Tech Stack
+
+Layer
+
+Technology
+
+Purpose
+
+Frontend
+
+React 18 + Vite
+
+Fast SPA dev server, component-based UI
+
+Styling
+
+Tailwind CSS
+
+Utility-first rapid UI styling
+
+HTTP Client
+
+Axios
+
+API calls from React to Express backend
+
+State Management
+
+React Context + useReducer
+
+Global auth and prompt state
+
+Backend
+
+Node.js + Express.js
+
+REST API server, route handling, middleware
+
+AI Engine
+
+Anthropic Claude API (claude-opus-4-6)
+
+SVG generation from prompts
+
+Database
+
+MongoDB (Mongoose ODM)
+
+Flexible document storage for users/SVGs
+
+Authentication
+
+JWT + bcryptjs
+
+Stateless auth tokens, password hashing
+
+File Storage
+
+Cloudflare R2 / AWS S3 (optional)
+
+Store exported SVG files
+
+Hosting — Frontend
+
+Vercel
+
+Static React build deployment
+
+Hosting — Backend
+
+Render / Railway
+
+Node.js server deployment
+
+Database Host
+
+MongoDB Atlas
+
+Managed cloud MongoDB
+
+Monitoring
+
+Sentry (backend) + Vercel Analytics
+
+Error tracking, performance
+
+
+
+
+3. Folder Structure
+
+3.1  Root Layout
+
+svg-generator/
+├── client/          ← React frontend (Vite)
+├── server/          ← Express backend (Node.js)
+└── README.md
+
+
+
+3.2  Backend Structure (server/)
+
+server/
+├── config/
+│   └── db.js            ← MongoDB connection
+├── controllers/
+│   ├── authController.js
+│   ├── svgController.js
+│   └── galleryController.js
+├── middleware/
+│   ├── authMiddleware.js  ← JWT verification
+│   └── rateLimiter.js
+├── models/
+│   ├── User.js
+│   └── Prompt.js
+├── routes/
+│   ├── authRoutes.js
+│   ├── svgRoutes.js
+│   └── galleryRoutes.js
+├── .env
+├── server.js            ← Entry point
+└── package.json
+
+
+
+3.3  Frontend Structure (client/)
+
+client/
+├── src/
+│   ├── api/
+│   │   └── axiosInstance.js   ← Axios base config
+│   ├── components/
+│   │   ├── PromptInput.jsx
+│   │   ├── SVGPreview.jsx
+│   │   └── GalleryGrid.jsx
+│   ├── context/
+│   │   └── AuthContext.jsx
+│   ├── pages/
+│   │   ├── Home.jsx
+│   │   ├── Generate.jsx
+│   │   ├── Gallery.jsx
+│   │   ├── History.jsx
+│   │   ├── Login.jsx
+│   │   └── Register.jsx
+│   ├── App.jsx
+│   └── main.jsx
+├── index.html
+├── vite.config.js
+└── package.json
+
+
+
+
+4. Environment Setup
+
+4.1  Prerequisites
+
+Node.js 18+ installed
+
+MongoDB Atlas account (free tier works for dev)
+
+Anthropic API key from console.anthropic.com
+
+Git repository initialized with client/ and server/ folders
+
+
+
+4.2  Backend Installation
+
+Navigate to server folder and initialize:
+
+cd server
+npm init -y
+
+Install dependencies:
+
+npm install express mongoose dotenv cors bcryptjs jsonwebtoken
+npm install @anthropic-ai/sdk express-rate-limit helmet morgan
+
+Install dev dependencies:
+
+npm install -D nodemon
+
+
+
+4.3  Frontend Installation
+
+Create Vite React app:
+
+cd client
+npm create vite@latest . -- --template react
+npm install
+
+Install additional packages:
+
+npm install axios react-router-dom
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+
+
+
+4.4  Environment Variables
+
+server/.env
+
+PORT=5000
+MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/svg_generator
+JWT_SECRET=your_super_secret_jwt_key_here
+ANTHROPIC_API_KEY=your_claude_api_key_here
+CLIENT_URL=http://localhost:5173
+
+client/.env
+
+VITE_API_URL=http://localhost:5000/api
+
+Security Warning
+
+Never commit .env files to version control. Add both server/.env and client/.env to .gitignore immediately.
+
+
+
+
+5. MongoDB Schema Design
+
+5.1  User Model (server/models/User.js)
+
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
+const userSchema = new mongoose.Schema({
+  name:      { type: String, required: true },
+  email:     { type: String, required: true, unique: true, lowercase: true },
+  password:  { type: String, required: true },
+  role:      { type: String, enum: ['user', 'admin'], default: 'user' },
+  createdAt: { type: Date, default: Date.now }
+});
+
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
+userSchema.methods.matchPassword = function(entered) {
+  return bcrypt.compare(entered, this.password);
+};
+
+module.exports = mongoose.model('User', userSchema);
+
+
+
+5.2  Prompt Model (server/models/Prompt.js)
+
+const mongoose = require('mongoose');
+
+const promptSchema = new mongoose.Schema({
+  user:     { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  text:     { type: String, required: true, maxlength: 500 },
+  svgCode:  { type: String, required: true },
+  isPublic: { type: Boolean, default: false },
+  likes:    { type: Number, default: 0 },
+  tags:     [String],
+}, { timestamps: true });
+
+module.exports = mongoose.model('Prompt', promptSchema);
+
+
+
+
+6. Backend — Express Server & Routes
+
+6.1  Entry Point (server/server.js)
+
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const connectDB = require('./config/db');
+require('dotenv').config();
+
+const app = express();
+connectDB();
+
+app.use(helmet());
+app.use(cors({ origin: process.env.CLIENT_URL }));
+app.use(morgan('dev'));
+app.use(express.json());
+
+app.use('/api/auth',    require('./routes/authRoutes'));
+app.use('/api/svg',     require('./routes/svgRoutes'));
+app.use('/api/gallery', require('./routes/galleryRoutes'));
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+
+6.2  MongoDB Connection (server/config/db.js)
+
+const mongoose = require('mongoose');
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
+
+
+
+6.3  API Routes
+
+Method
+
+Endpoint
+
+Auth
+
+Description
+
+POST
+
+/api/auth/register
+
+No
+
+Create new user account
+
+POST
+
+/api/auth/login
+
+No
+
+Login, returns JWT token
+
+GET
+
+/api/auth/me
+
+Yes
+
+Get current user profile
+
+POST
+
+/api/svg/generate
+
+Yes
+
+Send prompt to Claude, save & return SVG
+
+GET
+
+/api/svg/history
+
+Yes
+
+Get logged-in user's prompt history
+
+PATCH
+
+/api/svg/:id/toggle
+
+Yes
+
+Toggle isPublic on a prompt
+
+DELETE
+
+/api/svg/:id
+
+Yes
+
+Delete a saved prompt
+
+GET
+
+/api/gallery
+
+No
+
+Get all public SVGs for gallery
+
+POST
+
+/api/gallery/:id/like
+
+Yes
+
+Like a public SVG
+
+
+
+
+7. SVG Generation Controller
+
+7.1  Generate SVG (server/controllers/svgController.js)
+
+const Anthropic = require('@anthropic-ai/sdk');
+const Prompt = require('../models/Prompt');
+
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+exports.generateSVG = async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt) return res.status(400).json({ message: 'Prompt is required' });
+
+    const message = await client.messages.create({
+      model: 'claude-opus-4-6',
+      max_tokens: 4096,
+      system: `You are an expert SVG designer. Return ONLY valid SVG code.
+               Start with <svg and end with </svg>. No markdown, no explanation.`,
+      messages: [{ role: 'user', content: `Create an SVG for: ${prompt}` }]
+    });
+
+    const svgCode = message.content[0]?.text || '';
+
+    // Validate output
+    if (!svgCode.trim().startsWith('<svg')) {
+      return res.status(500).json({ message: 'Invalid SVG generated. Please retry.' });
+    }
+
+    const saved = await Prompt.create({
+      user: req.user._id,
+      text: prompt,
+      svgCode
+    });
+
+    res.status(201).json({ _id: saved._id, svgCode });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+
+
+8. JWT Authentication
+
+8.1  Auth Controller
+
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const signToken = (id) =>
+  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+exports.register = async (req, res) => {
+  const { name, email, password } = req.body;
+  const exists = await User.findOne({ email });
+  if (exists) return res.status(400).json({ message: 'Email already registered' });
+  const user = await User.create({ name, email, password });
+  res.status(201).json({ token: signToken(user._id), user: { id: user._id, name, email } });
+};
+
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user || !(await user.matchPassword(password)))
+    return res.status(401).json({ message: 'Invalid email or password' });
+  res.json({ token: signToken(user._id), user: { id: user._id, name: user.name, email } });
+};
+
+
+
+8.2  Auth Middleware (server/middleware/authMiddleware.js)
+
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+module.exports = async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'Not authorized' });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id).select('-password');
+    next();
+  } catch {
+    res.status(401).json({ message: 'Token invalid or expired' });
+  }
+};
+
+
+
+
+9. React Frontend
+
+9.1  Axios Instance (client/src/api/axiosInstance.js)
+
+import axios from 'axios';
+
+const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
+
+// Attach JWT token to every request
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+export default api;
+
+
+
+9.2  Auth Context (client/src/context/AuthContext.jsx)
+
+import { createContext, useContext, useState } from 'react';
+import api from '../api/axiosInstance';
+
+const AuthContext = createContext();
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+
+  const login = async (email, password) => {
+    const { data } = await api.post('/auth/login', { email, password });
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    setUser(data.user);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
+  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
+}
+
+export const useAuth = () => useContext(AuthContext);
+
+
+
+9.3  React Router Setup (client/src/App.jsx)
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Generate from './pages/Generate';
+import Gallery from './pages/Gallery';
+import History from './pages/History';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import PrivateRoute from './components/PrivateRoute';
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/"         element={<Home />} />
+        <Route path="/login"    element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/gallery"  element={<Gallery />} />
+        <Route path="/generate" element={<PrivateRoute><Generate /></PrivateRoute>} />
+        <Route path="/history"  element={<PrivateRoute><History /></PrivateRoute>} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+
+
+
+10. Core React Components
+
+10.1  Generate Page
+
+import { useState } from 'react';
+import api from '../api/axiosInstance';
+import SVGPreview from '../components/SVGPreview';
+
+export default function Generate() {
+  const [prompt, setPrompt]   = useState('');
+  const [svgCode, setSvgCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState('');
+
+  const handleGenerate = async () => {
+    if (!prompt.trim()) return;
+    setLoading(true); setError('');
+    try {
+      const { data } = await api.post('/svg/generate', { prompt });
+      setSvgCode(data.svgCode);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Generation failed. Try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+      <div>
+        <textarea
+          className="w-full border rounded p-3 h-40 resize-none"
+          placeholder="Describe your SVG... (e.g. a blue mountain landscape)"
+          value={prompt}
+          onChange={e => setPrompt(e.target.value)}
+          maxLength={500}
+        />
+        <button
+          onClick={handleGenerate}
+          disabled={loading}
+          className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          {loading ? 'Generating...' : 'Generate SVG'}
+        </button>
+        {error && <p className="text-red-500 mt-2">{error}</p>}
+      </div>
+      <SVGPreview svgCode={svgCode} />
+    </div>
+  );
+}
+
+
+
+10.2  SVGPreview Component
+
+function SVGPreview({ svgCode }) {
+  const download = () => {
+    const blob = new Blob([svgCode], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'generated.svg'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const copy = () => navigator.clipboard.writeText(svgCode);
+
+  if (!svgCode) return <div className="border rounded flex items-center
+    justify-center h-96 text-gray-400">SVG preview will appear here</div>;
+
+  return (
+    <div className="border rounded p-4">
+      <div dangerouslySetInnerHTML={{ __html: svgCode }} className="w-full h-80" />
+      <div className="flex gap-2 mt-4">
+        <button onClick={download} className="btn">Download SVG</button>
+        <button onClick={copy}     className="btn">Copy Code</button>
+      </div>
+    </div>
+  );
+}
+
+XSS Warning
+
+SVG code from the AI must be sanitized before using dangerouslySetInnerHTML. Install DOMPurify: npm install dompurify, then wrap the svgCode: DOMPurify.sanitize(svgCode, { USE_PROFILES: { svg: true } })
+
+
+
+
+11. Rate Limiting & Security
+
+11.1  Rate Limiter (server/middleware/rateLimiter.js)
+
+const rateLimit = require('express-rate-limit');
+
+exports.generateLimiter = rateLimit({
+  windowMs: 60 * 1000,  // 1 minute
+  max: 10,              // 10 requests per minute per IP
+  message: { message: 'Too many requests. Please wait before generating again.' }
+});
+
+exports.authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  message: { message: 'Too many auth attempts. Try again later.' }
+});
+
+
+
+11.2  Security Checklist
+
+helmet() middleware adds secure HTTP headers to all Express responses
+
+CORS configured to allow only the CLIENT_URL origin
+
+JWT tokens expire after 7 days — implement refresh tokens for production
+
+Passwords hashed with bcrypt (salt rounds: 12)
+
+SVG output sanitized with DOMPurify on the frontend before rendering
+
+MongoDB queries use Mongoose (prevents NoSQL injection)
+
+User input validated for max length before sending to Claude API
+
+
+
+
+12. Testing Strategy
+
+12.1  Backend Tests (Jest + Supertest)
+
+npm install -D jest supertest
+
+Test POST /api/auth/register — valid and duplicate email cases
+
+Test POST /api/svg/generate — with mocked Claude API response
+
+Test auth middleware — missing token, expired token, valid token
+
+Test MongoDB CRUD operations with in-memory MongoDB (mongodb-memory-server)
+
+
+
+12.2  Frontend Tests (Vitest + Testing Library)
+
+npm install -D vitest @testing-library/react @testing-library/user-event
+
+Test Generate page renders correctly
+
+Test SVGPreview shows placeholder when no code provided
+
+Test download and copy buttons trigger correct actions
+
+
+
+12.3  E2E Tests (Playwright)
+
+Full flow: Register → Login → Generate SVG → Download
+
+Gallery page displays public SVGs
+
+Protected routes redirect unauthenticated users to /login
+
+
+
+
+13. Deployment
+
+13.1  Deployment Targets
+
+Component
+
+Platform
+
+Notes
+
+React Frontend
+
+Vercel
+
+Connect GitHub repo, set VITE_API_URL env var
+
+Express Backend
+
+Render / Railway
+
+Set all server .env vars in dashboard
+
+MongoDB
+
+MongoDB Atlas
+
+Free M0 cluster for dev, M10 for production
+
+File Storage (optional)
+
+Cloudflare R2
+
+SVG file uploads at scale
+
+
+
+13.2  Backend Deployment Steps (Render)
+
+Push server/ to GitHub
+
+Create new Web Service on render.com, point to server/ folder
+
+Set Build Command: npm install
+
+Set Start Command: node server.js
+
+Add all environment variables from server/.env in Render dashboard
+
+Copy the Render URL — this is your VITE_API_URL for the frontend
+
+
+
+13.3  Frontend Deployment Steps (Vercel)
+
+Push client/ to GitHub (or a monorepo)
+
+Import project on vercel.com, set Root Directory to client/
+
+Add VITE_API_URL environment variable pointing to Render backend URL
+
+Deploy — Vercel auto-deploys on every git push to main
+
+
+
+13.4  MongoDB Atlas Setup
+
+Create a free cluster at mongodb.com/atlas
+
+Add a database user with read/write access
+
+Whitelist all IPs (0.0.0.0/0) for Render/Railway dynamic IPs
+
+Copy the connection string to MONGO_URI in server/.env and Render dashboard
+
+
+
+13.5  CI/CD (GitHub Actions)
+
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with: { node-version: '18' }
+      - name: Backend tests
+        run: cd server && npm ci && npm test
+      - name: Frontend build
+        run: cd client && npm ci && npm run build
+
+
+
+
+14. Milestones & Timeline
+
+Phase
+
+Tasks
+
+Duration
+
+Phase 1: Setup
+
+Repo init, folder structure, env config, MongoDB Atlas
+
+2–3 days
+
+Phase 2: Backend Auth
+
+User model, JWT register/login, protected routes
+
+2–3 days
+
+Phase 3: Claude Integration
+
+SVG controller, generate route, output validation
+
+2–3 days
+
+Phase 4: React Frontend
+
+Vite setup, Axios, Auth Context, Router, all pages
+
+5–7 days
+
+Phase 5: Features
+
+Gallery, history, download/export, like system
+
+3–4 days
+
+Phase 6: Security
+
+Rate limiting, DOMPurify, helmet, input validation
+
+2 days
+
+Phase 7: Testing
+
+Jest, Supertest, Vitest, Playwright E2E
+
+3–4 days
+
+Phase 8: Deploy
+
+Render + Vercel + Atlas, CI/CD pipeline
+
+2–3 days
+
+Total
+
+
+
+~21–29 days
+
+
+
+
+15. APIs Used in This Project
+
+#
+
+API
+
+Purpose
+
+Required
+
+1
+
+Anthropic Claude API
+
+Core SVG generation from prompts (claude-opus-4-6)
+
+Yes
+
+2
+
+Your Express REST API
+
+5 internal endpoints (auth, generate, history, gallery, like)
+
+Yes
+
+3
+
+MongoDB Atlas API (Mongoose)
+
+Database CRUD via Mongoose ODM
+
+Yes
+
+4
+
+JWT API (jsonwebtoken)
+
+Token generation and verification for auth
+
+Yes
+
+5
+
+Cloudflare R2 / AWS S3
+
+SVG file storage at scale
+
+Optional
+
+6
+
+Sentry API
+
+Error monitoring and alerting in production
+
+Optional
+
+
+
+
+16. Future Enhancements
+
+SVG animation — generate animated SVGs with CSS or SMIL
+
+Style presets — Flat, Isometric, Line Art, Gradient, etc.
+
+Prompt history search — full-text search across past prompts
+
+Team workspaces — shared galleries and collaboration
+
+Public API — let developers call the generation endpoint with API keys
+
+Monetization — subscription tiers with higher rate limits
+
+Mobile app — React Native client using the same Express backend
+
+
+
+Summary
+
+This SOP covers the complete MERN stack implementation of the AI-Powered SVG Generator — MongoDB for data, Express.js for the REST API, React (Vite) for the SPA frontend, Node.js as the runtime, and the Anthropic Claude API for AI-powered SVG generation. Follow phases in order, complete the deployment checklist before going live, and return to this document when onboarding new team members.
+
+
+
+END OF DOCUMENT
+
+Confidential | SVG Generator MERN SOP v2.0
