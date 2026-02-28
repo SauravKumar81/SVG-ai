@@ -15,7 +15,7 @@ exports.generateSVG = async (req, res) => {
 
         try {
             const model = genAI.getGenerativeModel({
-                model: 'gemini-1.5-pro-latest',
+                model: 'gemini-2.5-flash',
                 systemInstruction: `You are an expert SVG designer. Return ONLY valid SVG code.
                  Start with <svg and end with </svg>. No markdown, no explanation.`
             });
@@ -25,6 +25,11 @@ exports.generateSVG = async (req, res) => {
 
             // Strip any markdown codeblock formatting if Gemini accidentally adds it
             svgCode = svgCode.replace(/^```(xml|svg)?\n?/i, '').replace(/\n?```$/i, '').trim();
+
+            // Critical fix for downloads: Standalone SVGs require xmlns to render as images locally
+            if (!svgCode.includes('xmlns="http://www.w3.org/2000/svg"') && !svgCode.includes("xmlns='http://www.w3.org/2000/svg'")) {
+                svgCode = svgCode.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
 
         } catch (apiError) {
             console.error("Gemini API Error:", apiError);

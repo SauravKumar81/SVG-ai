@@ -1,16 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Key, Clock, Settings, Copy, CheckCircle2, LogOut, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import api from '../api/axiosInstance';
+import { useAuth } from '../context/AuthContext';
 export default function Dashboard() {
+  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('settings');
   const [copiedKey, setCopiedKey] = useState(false);
+  const [historyItems, setHistoryItems] = useState([]);
   const apiKey = "svg_live_q8d73k2ld98fj4mf03n5vx8s";
+
+  useEffect(() => {
+    if (activeTab === 'history') {
+      api.get('/svg/history')
+        .then(res => setHistoryItems(res.data))
+        .catch(err => console.error(err));
+    }
+  }, [activeTab]);
 
   const copyKey = () => {
     navigator.clipboard.writeText(apiKey);
     setCopiedKey(true);
     setTimeout(() => setCopiedKey(false), 2000);
+  };
+
+  const downloadHistorySvg = (svgCode, id) => {
+    if (!svgCode) return;
+    const blob = new Blob([svgCode], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `svg-ai-${id}.svg`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 200);
   };
 
   const tabs = [
@@ -30,7 +56,7 @@ export default function Dashboard() {
               S
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Saurav</h2>
+              <h2 className="text-xl font-bold text-white">{user ? user.name : 'Unknown'}</h2>
               <p className="text-sm text-cyan-400 font-medium tracking-wide outline outline-1 outline-cyan-500/50 bg-cyan-500/10 rounded-full px-2 py-0.5 mt-1 inline-block">PRO PLAN</p>
             </div>
           </div>
@@ -52,7 +78,7 @@ export default function Dashboard() {
             })}
           </nav>
 
-          <button className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 font-medium text-sm transition-all md:mt-12 hidden md:flex">
+          <button onClick={logout} className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 font-medium text-sm transition-all md:mt-12 hidden md:flex">
             <LogOut className="w-5 h-5" />
             Sign Out
           </button>
@@ -71,11 +97,11 @@ export default function Dashboard() {
               <div className="grid gap-6 max-w-xl">
                 <div className="space-y-2">
                   <label className="text-sm font-medium tracking-wide text-slate-300">Name</label>
-                  <input type="text" defaultValue="Saurav" className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all text-white font-medium" />
+                  <input type="text" readOnly value={user ? user.name : ''} className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all text-white font-medium" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium tracking-wide text-slate-300">Email Address</label>
-                  <input type="email" defaultValue="saurav@example.com" className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all text-white font-medium" />
+                  <input type="email" readOnly value={user ? user.email : ''} className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all text-white font-medium" />
                 </div>
               </div>
               
@@ -126,24 +152,26 @@ export default function Dashboard() {
 
           {activeTab === 'history' && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-              <div className="flex justify-between items-center bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                    <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path d="M9 10l3 3-3 3" /></svg>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-lg text-white">Neon Cyberpunk Brain</h4>
-                    <p className="text-xs text-slate-400 font-mono mt-1">Generated: Oct 24, 2026 • 24.3KB</p>
-                  </div>
-                </div>
-                <button className="px-4 py-2 bg-slate-700 hover:bg-cyan-600 hover:text-white text-slate-300 font-medium rounded-lg text-sm transition-all flex items-center gap-2">
-                  <Download className="w-4 h-4" /> SVG
-                </button>
-              </div>
               
-              <div className="text-center py-10 opacity-50">
-                <p>No older items in generation history.</p>
-              </div>
+              {historyItems.length > 0 ? historyItems.map(item => (
+                 <div key={item._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50 gap-4">
+                  <div className="flex items-center gap-4 w-full sm:w-auto overflow-hidden">
+                    <div className="w-12 h-12 bg-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)] shrink-0 overflow-hidden p-1 [&>svg]:w-full [&>svg]:h-full" dangerouslySetInnerHTML={{__html: item.svgCode}} />
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-bold text-lg text-white truncate w-full" title={item.text}>{item.text}</h4>
+                      <p className="text-xs text-slate-400 font-mono mt-1">Generated: {new Date(item.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => downloadHistorySvg(item.svgCode, item._id)} className="px-4 py-2 bg-slate-700 hover:bg-cyan-600 hover:text-white text-slate-300 font-medium rounded-lg text-sm transition-all flex items-center gap-2 whitespace-nowrap">
+                    <Download className="w-4 h-4" /> Download SVG
+                  </button>
+                </div>
+              )) : (
+                <div className="text-center py-10 opacity-50">
+                  <p>You haven't generated any SVGs yet.</p>
+                </div>
+              )}
+              
             </motion.div>
           )}
 

@@ -27,11 +27,6 @@ export default function Generate() {
     setSvgCode(null);
     
     try {
-      // Temporary token insertion for testing so the backend AuthMiddleware passes
-      if (!localStorage.getItem('token')) {
-        localStorage.setItem('token', 'dummy-token-for-dev');
-      }
-      
       const { data } = await api.post('/svg/generate', { prompt });
       setSvgCode(data.svgCode);
     } catch (err) {
@@ -52,13 +47,17 @@ export default function Generate() {
 
   const downloadSvg = () => {
     if (!svgCode) return;
-    const blob = new Blob([svgCode], { type: 'image/svg+xml' });
+    const blob = new Blob([svgCode], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `generated-${Date.now()}.svg`;
+    a.download = `svg-ai-${Date.now()}.svg`;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 200);
   };
 
   return (

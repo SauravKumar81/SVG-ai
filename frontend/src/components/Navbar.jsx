@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Sparkles, User, Image, Compass, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { Sparkles, User, Image, Compass, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
+  const { user, logout } = useAuth();
 
   const navItems = [
     { name: 'Generate', path: '/generate', icon: Sparkles },
@@ -56,14 +58,24 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* User Profile Dropdown (simplified) */}
-            <Link to="/dashboard" className="flex items-center gap-3 px-3 py-1.5 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10 transition-all">
-              <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
-                <User className="w-4 h-4 text-slate-400" />
+            {user ? (
+              <div className="flex items-center gap-3">
+                <Link to="/dashboard" className="flex items-center gap-3 px-3 py-1.5 rounded-full hover:bg-white/5 border border-transparent hover:border-white/10 transition-all group">
+                  <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
+                    <User className="w-4 h-4 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                  </div>
+                  <span className="text-sm font-medium text-slate-300 hidden sm:block">{user.name}</span>
+                </Link>
+                <button onClick={logout} className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-white/5 transition-all outline-none" title="Log Out">
+                  <LogOut className="w-5 h-5" />
+                </button>
               </div>
-              <span className="text-sm font-medium text-slate-300 hidden sm:block">Saurav</span>
-              <ChevronDown className="w-4 h-4 text-slate-500" />
-            </Link>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link to="/login" className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">Log In</Link>
+                <Link to="/register" className="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all">Sign Up</Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -24,6 +24,27 @@ export default function Gallery() {
     item.author.toLowerCase().includes(search.toLowerCase())
   );
 
+  const downloadGallerySvg = (svgCode, id) => {
+    if (!svgCode) return;
+    const blob = new Blob([svgCode], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `svg-gallery-${id}.svg`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 200);
+  };
+
+  const copyGallerySvg = (svgCode) => {
+    if (!svgCode) return;
+    navigator.clipboard.writeText(svgCode);
+    alert('SVG code copied to clipboard!');
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-24 text-slate-100 min-h-screen">
       
@@ -80,10 +101,10 @@ export default function Gallery() {
                 
                 {/* Overlay actions */}
                 <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 backdrop-blur-sm transition-opacity duration-300 flex items-center justify-center gap-3">
-                  <button className="w-10 h-10 rounded-full bg-white text-slate-900 flex items-center justify-center hover:bg-cyan-400 hover:text-white transition-all transform hover:scale-110 shadow-lg">
+                  <button onClick={() => downloadGallerySvg(item.svg, item.id)} className="w-10 h-10 rounded-full bg-white text-slate-900 flex items-center justify-center hover:bg-cyan-400 hover:text-white transition-all transform hover:scale-110 shadow-lg" title="Download SVG">
                     <Download className="w-4 h-4" />
                   </button>
-                  <button className="w-10 h-10 rounded-full bg-slate-800 border border-slate-600 text-slate-300 flex items-center justify-center hover:bg-slate-700 transition-all transform hover:scale-110 shadow-lg">
+                  <button onClick={() => copyGallerySvg(item.svg)} className="w-10 h-10 rounded-full bg-slate-800 border border-slate-600 text-slate-300 flex items-center justify-center hover:bg-slate-700 transition-all transform hover:scale-110 shadow-lg" title="Copy XML">
                     <Copy className="w-4 h-4" />
                   </button>
                 </div>
